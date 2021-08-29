@@ -62,13 +62,13 @@ option:disabled {
   width: 45%;
 }
 
-.from-currency .label, .to-currency .label {
+.from-currency .tip-label, .to-currency .tip-label {
   font-size: 1em;
   padding: 10px 0;
   color: #ccc;
 }
 
-.from-currency:hover .label, .to-currency:hover .label {
+.from-currency:hover .tip-label, .to-currency:hover .tip-label {
   color: #666;
 }
 
@@ -228,3 +228,42 @@ option:disabled {
   color: #ccc;
 }
 
+.currency-select .value-container {
+  padding: 5px 10px;
+}
+
+.currency-select .value-container .flag-icon {
+  margin-right: 10px;
+}
+
+.currency-select .option {
+  cursor: pointer;
+  padding: 5px 10px;
+}
+
+.currency-select .option.empty-option {
+  height: 1.5em;
+}
+
+.currency-select .option .flag-icon {
+  /*width: 60px;*/
+  /*vertical-align: text-bottom;*/
+  margin-right: 10px;
+}
+
+.currency-select .option.disabled .flag-icon {
+  opacity: 0.3;
+}
+
+.currency-select .option .balance {
+  /*position: absolute;*/
+  float: right;
+  margin-top: 5px;
+  color: unset;
+  font-size: 0.6em;
+  text-align: right;
+}
+.currency-select .option:hover {
+  background-color: dodgerblue;
+  color: #fff;
+}

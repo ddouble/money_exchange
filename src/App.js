@@ -3,9 +3,12 @@ import './App.css';
 
 import {Backdrop, Button, CircularProgress} from "@material-ui/core";
 import {Alert} from "@material-ui/lab";
+
 import CheckCircleTwoToneIcon from '@material-ui/icons/CheckCircleTwoTone';
+
 import {IMaskInput} from "react-imask";
 import IMask from "imask";
+import {CurrencySelect} from "./components/CurrencySelect";
 
 /**
  * check if val is a number
@@ -14,16 +17,16 @@ function isNumber(val) {
   return !isNaN(+val);
 }
 
-let wallets = [
+const wallets = [
   {currency: 'usd', balance: 200},
   {currency: 'gbp', balance: 380},
   {currency: 'eur', balance: 5230}
 ];
 
-let currenies = [
-  {label: 'USD', value: 'usd', unit: '$'},
-  {label: 'GBP', value: 'gbp', unit: '£'},
-  {label: 'EUR', value: 'eur', unit: '€'}
+const currencies = [
+  {label: 'USD', value: 'usd', unit: '$', flag: 'usa'},
+  {label: 'GBP', value: 'gbp', unit: '£', flag: 'gbr'},
+  {label: 'EUR', value: 'eur', unit: '€', flag: 'eun'}
 ];
 
 // generate random integer which less than max
@@ -47,6 +50,7 @@ const currencyFormatter = IMask.createPipe({
   thousandsSeparator: ',',
   padFractionalZeros: false
 });
+
 
 function App() {
   const [amount, setAmount] = React.useState('');
@@ -75,6 +79,7 @@ function App() {
     validate['to-currency'](toCurrencyVal);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   // refresh exchange rate when from-currency or to-currency is changed
   useEffect(() => {
@@ -139,26 +144,22 @@ function App() {
     }
   }
 
-  // const onAmountChange = (event) => {
-  //   setAmount(parseFloat(event.target.value));
-  //   validate[event.target.name](event.target.value);
-  // };
-
   const onAmountChange = (value, mask) => {
     setAmount(mask.unmaskedValue);
     validate[mask.el.input.name](mask.unmaskedValue);
   };
 
-  const onFromCurrencyChange = (event) => {
-    setFromCurrencyVal(event.target.value);
+  const onFromCurrencyChange = (val) => {
+    setFromCurrencyVal(val.value);
     setAmount('');
-    validate[event.target.name](event.target.value);
+    validate['from-currency'](val.value);
     validate['amount']('');
   }
 
-  const onToCurrencyChange = (event) => {
-    setToCurrencyVal(event.target.value);
-    validate[event.target.name](event.target.value);
+
+  const onToCurrencyChange = (val) => {
+    setToCurrencyVal(val.value);
+    validate['to-currency'](val.value);
   }
 
   function onSwitchClick() {
@@ -235,7 +236,7 @@ function App() {
   // search currency information
   const currency = (currencyValue) => {
     // todo: optimize searching performance
-    return currenies.find((v) => v.value === currencyValue)
+    return currencies.find((v) => v.value === currencyValue)
   }
 
   // search wallet information
@@ -275,22 +276,21 @@ function App() {
 
         {/* from curreny */}
         <div className={"from-currency"}>
-          <div className={"label noselect"}>Sell</div>
+          <div className={"tip-label noselect"}>Sell</div>
           <div className={"currency-input-box"}>
             <div className={"type-box"}>
-              <select name={'from-currency'} value={fromCurrencyVal} onChange={onFromCurrencyChange}>
-                {wallets.map((w, i) => {
-                  let c = currency(w.currency);
-                  return <option key={i} value={c.value}>{c.label}</option>
-                })}
-              </select>
+
+              <CurrencySelect name={'from-currency'}
+                              value={{...fromCurrency, balance: currentWallet.balance}}
+                              isSearchable={false}
+                              options={wallets.map((w, i) => {
+                                let c = currency(w.currency);
+                                return {...c, balance: w.balance}
+                              })}
+                              onChange={onFromCurrencyChange}/>
             </div>
             <div className={`amount-box ${errors['amount'] ? "error" : ""}`}>
-              {/* todo: use comma in number */}
               <label>{fromCurrency.unit}</label>
-              {/*<input name={"amount"} onChange={onAmountChange} className={"amount"}*/}
-              {/*       value={amount}*/}
-              {/*       placeholder={"0.00"}/>*/}
               <IMaskInput name={"amount"} onAccept={onAmountChange} className={"amount"}
                           mask={Number}
                           scale={2}
@@ -299,27 +299,29 @@ function App() {
                           padFractionalZeros={false}
                           thousandsSeparator={","}
                           unmask={true}
-                          // inputRef={el => amountInput = el}
                           value={amount}
                           placeholder={"0.00"}/>
             </div>
           </div>
-          <div className={"balance"}>Balance: <strong>{fromCurrency.unit}{currencyFormatter(currentWallet.balance.toString())}</strong></div>
+          <div
+            className={"balance"}>Balance: <strong>{fromCurrency.unit}{currencyFormatter(currentWallet.balance.toString())}</strong>
+          </div>
         </div>
         <div className={"switch noselect"} onClick={onSwitchClick}>&lt;&gt;</div>
 
         {/* to curreny */}
         <div className={"to-currency"}>
-          <div className={"label noselect"}>Get</div>
+          <div className={"tip-label noselect"}>Get</div>
           <div className={"currency-input-box"}>
             <div className={`type-box ${errors['to-currency'] ? 'error' : ''}`}>
-              <select name={'to-currency'} value={toCurrencyVal} onChange={onToCurrencyChange}>
-                <option key={'none'} value={'none'} style={{color: '#eee'}}></option>
-                {currenies.map((c, i) => (
-                  // c.value != fromCurrencyVal ? <option key={i} value={c.value}>{c.label}</option> : null
-                  <option key={i} disabled={c.value === fromCurrencyVal} value={c.value}>{c.label}</option>
-                ))}
-              </select>
+              <CurrencySelect name={'to-currency'}
+                              value={toCurrency ? {...toCurrency} : {value: 'none'}}
+                              isSearchable={false}
+                              options={[{value: 'none'}].concat(currencies).map((c, i) => {
+                                return {...c}
+                              })}
+                              isOptionDisabled={option => option.value === fromCurrencyVal}
+                              onChange={onToCurrencyChange}/>
             </div>
             <div className={"amount-box"}>
               <label>{toCurrency ? toCurrency.unit : ''}</label>
@@ -341,12 +343,13 @@ function App() {
       </div>
 
       <div>
-        <Button disabled={!isNumber(amount) || !amount || !toCurrency || isExchanging !== null || hasBlockedError()}
-                variant={"contained"}
-                disableElevation
-                color={"primary"} size={"large"}
-                className={"exchange-button"}
-                onClick={onContinueClick}>{!isExchanging ? 'Continue' : 'Exchanging ...'}</Button>
+        <Button
+          disabled={!isNumber(amount) || !amount || toCurrencyVal === fromCurrencyVal || !toCurrency || isExchanging !== null || hasBlockedError()}
+          variant={"contained"}
+          disableElevation
+          color={"primary"} size={"large"}
+          className={"exchange-button"}
+          onClick={onContinueClick}>{!isExchanging ? 'Continue' : 'Exchanging ...'}</Button>
       </div>
 
       <Backdrop className={"exchange-notify"} open={isExchanging !== null} onClick={onExchangeNotifyClick}>
