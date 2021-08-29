@@ -24,8 +24,15 @@ let currenies = [
   {label: 'EUR', value: 'eur', unit: '€'}
 ];
 
+// generate random integer which less than max
 function getRandomInt(max) {
   return Math.floor(Math.random() * max);
+}
+
+// round money value which represent by float
+// todo: use cent unit and integer to represent money
+function roundMoney(val) {
+  return Math.round(val * 100) / 100;
 }
 
 function App() {
@@ -152,28 +159,28 @@ function App() {
     if (isExchanging) {
       /**
        * simulate long-time server operation
-       * there are one forth opportunities to simulate failed status
+       * there are one sixth opportunities to simulate failed status
        */
 
       const {rates, amount, toCurrencyVal, fromCurrencyVal} = isExchanging;
       const rate = rates[toCurrencyVal.toUpperCase()];
-      const toAmount = Math.round(amount * rate * 100) / 100;
+      const toAmount = roundMoney(amount * rate);
       // console.log(amount, rate, toAmount);
 
       setTimeout(() => {
         // simulate success/failed status
-        const success = getRandomInt(3);
+        const success = getRandomInt(5);
         if (success) {
           wallets.forEach((v, i) => {
-            if (v.currency === fromCurrencyVal) v.balance -= amount;
-            else if (v.currency === toCurrencyVal) v.balance += toAmount;
+            if (v.currency === fromCurrencyVal) v.balance = roundMoney(v.balance - amount);
+            else if (v.currency === toCurrencyVal) v.balance = roundMoney(v.balance + toAmount);
           });
 
           setIsExchangeSuccess(true);
 
-          setTimeout(() => {
-            setIsExchanging(null);
-          }, 2000);
+          // setTimeout(() => {
+          //   setIsExchanging(null);
+          // }, 5000);
         }
         else {
           setErrors(errors => ({
@@ -184,7 +191,7 @@ function App() {
           // clear exchange error notify after seconds
           setTimeout(() => {
             clearError('exchange');
-          }, 6000);
+          }, 10000);
           setIsExchanging(null);
         }
       }, 2000);
@@ -197,6 +204,13 @@ function App() {
 
     // clear previous exchange error
     clearError('exchange');
+  }
+
+  function onExchangeNotifyClick() {
+    if (isExchangeSuccess) {
+      setIsExchanging(null);
+      setIsExchangeSuccess(false);
+    }
   }
 
   // search currency information
@@ -219,6 +233,7 @@ function App() {
   }
 
   const currentWallet = wallet(fromCurrencyVal);
+  const currentToWallet = wallet(toCurrencyVal);
   const fromCurrency = currency(fromCurrencyVal);
   const toCurrency = toCurrencyVal !== 'none' ? currency(toCurrencyVal) : null;
 
@@ -231,7 +246,7 @@ function App() {
     ((fromCurrencyVal !== toCurrencyVal) ? rates[toCurrencyVal.toUpperCase()] : 1) : null;
 
   // expected amount after exchanging
-  const toAmount = (isNumber(amount) && amount && rate) ? Math.round(amount * rate * 100) / 100 : '';
+  const toAmount = (isNumber(amount) && amount && rate) ? roundMoney(amount * rate) : '';
 
   return (
     <div className="App">
@@ -303,11 +318,15 @@ function App() {
                 onClick={onContinueClick}>{!isExchanging ? 'Continue' : 'Exchanging ...'}</Button>
       </div>
 
-      <Backdrop className={"exchanging-notify"} open={isExchanging !== null}>
+      <Backdrop className={"exchange-notify"} open={isExchanging !== null} onClick={onExchangeNotifyClick}>
         {!isExchangeSuccess ? <div className={"exchange-progress"}><CircularProgress color="inherit"/></div> : null}
         {isExchangeSuccess ? <div className={"exchange-success-notify"}>
           <CheckCircleTwoToneIcon className={"icon"} />
-          <div className={"message"}>Completed</div>
+          <div className={"message"}>Completed<br/></div>
+          <div className={"balance"}>
+            <strong>{toCurrency.label}</strong> balance:
+            <div className={'currency'}>{toCurrency.unit} { currentToWallet.balance}</div>
+          </div>
         </div> : null}
       </Backdrop>
     </div>
