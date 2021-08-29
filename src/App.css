@@ -1,5 +1,8 @@
 .App {
-  text-align: center;
+  /*text-align: center;*/
+  width: 900px;
+  margin: auto;
+  padding: 20px;
 }
 
 .App-logo {
@@ -36,3 +39,178 @@
     transform: rotate(360deg);
   }
 }
+
+option:disabled {
+  color: #ccc;
+}
+
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                   supported by Chrome, Edge, Opera and Firefox */
+}
+
+
+.from-currency {
+  float: left;
+  width: 45%;
+}
+
+.from-currency .label, .to-currency .label {
+  font-size: 1em;
+  padding: 10px 0;
+  color: #ccc;
+}
+
+.from-currency:hover .label, .to-currency:hover .label {
+  color: #666;
+}
+
+.from-currency .currency-input-box .amount-box.error {
+  background-color: pink;
+}
+
+.from-currency .balance {
+  color: #666;
+  text-align: right;
+  /*margin-top: 5px;*/
+}
+
+.switch {
+  float: left;
+  width: 10%;
+  text-align: center;
+  /*line-height: 2.5em;*/
+  font-size: 2em;
+  color: #ccc;
+  cursor: pointer;
+
+  padding-top: 1.4em;
+}
+
+.switch:hover {
+  color: #999;
+}
+
+.to-currency {
+  float: left;
+  width: 45%;
+}
+
+.clearfix:after {
+  content: ".";
+  visibility: hidden;
+  display: block;
+  height: 0;
+  clear: both;
+}
+
+.currency-input-box {
+  /*width: 100%;*/
+  font-size: 2em;
+  border: 1px solid #ccc;
+}
+
+.currency-input-box .type-box {
+  /*background-color: #eff;*/
+}
+
+
+.currency-input-box .type-box select {
+  width: 100%;
+  border: none;
+  background-color: transparent;
+  font-size: 1em;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.currency-input-box .amount-box > label {
+  padding: 0 10px;
+  font-size: 1em;
+  color: #999;
+  vertical-align: super;
+}
+
+.currency-input-box .amount-box .amount {
+  border: none;
+  width: 80%;
+  margin: auto;
+  font-size: 1.6em;
+  line-height: 1.6em;
+  outline: none;
+  background-color: transparent;
+}
+
+.to-currency .currency-input-box .type-box.error {
+  background-color: pink;
+}
+
+.to-currency .currency-input-box .amount-box {
+  background-color: #eee;
+}
+
+.to-currency .amount-box .amount {
+  background-color: transparent;
+}
+
+.to-currency .rate {
+  color: #666;
+  text-align: right;
+  /*margin-top: 5px;*/
+}
+
+.to-currency .rate.hide {
+  visibility: hidden;
+}
+
+.alert-message-box {
+  margin-top: 20px;
+  /*visibility: hidden;*/
+
+}
+
+
+.MuiButtonBase-root.exchange-button {
+  width: 100%;
+  /*height: 40px;*/
+  margin: 20px 0;
+  /*background-color: skyblue;*/
+  /*border: none;*/
+  /*cursor: pointer;*/
+  text-transform: none;
+}
+
+
+.MuiBackdrop-root.exchanging-notify {
+  z-index: 99999;
+  color: #fff;
+  align-items: unset;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.exchanging-notify .exchange-progress {
+  margin-top: 200px;
+}
+
+.exchange-success-notify {
+  margin-top: 120px;
+}
+
+.exchange-success-notify .icon {
+  font-size: 160px;
+  color: lightgreen;
+}
+
+.exchange-success-notify .message {
+  text-align: center;
+  font-weight: bold;
+  color: lightgreen;
+}
+

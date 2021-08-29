@@ -5,9 +5,13 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
+  // todo: Fix Material UI backdrop cause a warning (findDomnode) in StrictMode
   <React.StrictMode>
     <App />
   </React.StrictMode>,
+  // <React.Fragment>
+  //   <App />
+  // </React.Fragment>,
   document.getElementById('root')
 );
 
