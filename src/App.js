@@ -4,6 +4,8 @@ import './App.css';
 import {Backdrop, Button, CircularProgress} from "@material-ui/core";
 import {Alert} from "@material-ui/lab";
 import CheckCircleTwoToneIcon from '@material-ui/icons/CheckCircleTwoTone';
+import {IMaskInput} from "react-imask";
+import IMask from "imask";
 
 /**
  * check if val is a number
@@ -35,6 +37,17 @@ function roundMoney(val) {
   return Math.round(val * 100) / 100;
 }
 
+// format currency number
+const currencyFormatter = IMask.createPipe({
+  mask: Number,
+  scale: 2,
+  radix: '.',
+  signed: false,
+  unmask: 'typed',
+  thousandsSeparator: ',',
+  padFractionalZeros: false
+});
+
 function App() {
   const [amount, setAmount] = React.useState('');
   const [rates, setRates] = React.useState({});
@@ -45,6 +58,7 @@ function App() {
 
   const [errors, setErrors] = React.useState({});
 
+  // clear specific error
   function clearError(name) {
     setErrors(errors => {
       const _errors = {...errors};
@@ -52,6 +66,7 @@ function App() {
       return _errors;
     });
   }
+
 
   // initialize on app load
   useEffect(() => {
@@ -124,9 +139,14 @@ function App() {
     }
   }
 
-  const onAmountChange = (event) => {
-    setAmount(parseFloat(event.target.value));
-    validate[event.target.name](event.target.value);
+  // const onAmountChange = (event) => {
+  //   setAmount(parseFloat(event.target.value));
+  //   validate[event.target.name](event.target.value);
+  // };
+
+  const onAmountChange = (value, mask) => {
+    setAmount(mask.unmaskedValue);
+    validate[mask.el.input.name](mask.unmaskedValue);
   };
 
   const onFromCurrencyChange = (event) => {
@@ -181,8 +201,7 @@ function App() {
           // setTimeout(() => {
           //   setIsExchanging(null);
           // }, 5000);
-        }
-        else {
+        } else {
           setErrors(errors => ({
             ...errors,
             exchange: {message: 'Exchange failed.'}
@@ -248,6 +267,7 @@ function App() {
   // expected amount after exchanging
   const toAmount = (isNumber(amount) && amount && rate) ? roundMoney(amount * rate) : '';
 
+  // let amountInput = null;
   return (
     <div className="App">
       <h1>Money Exchange</h1>
@@ -268,12 +288,23 @@ function App() {
             <div className={`amount-box ${errors['amount'] ? "error" : ""}`}>
               {/* todo: use comma in number */}
               <label>{fromCurrency.unit}</label>
-              <input name={"amount"} onChange={onAmountChange} className={"amount"}
-                     value={amount}
-                     placeholder={"0.00"}/>
+              {/*<input name={"amount"} onChange={onAmountChange} className={"amount"}*/}
+              {/*       value={amount}*/}
+              {/*       placeholder={"0.00"}/>*/}
+              <IMaskInput name={"amount"} onAccept={onAmountChange} className={"amount"}
+                          mask={Number}
+                          scale={2}
+                          radix={"."}
+                          signed={false}
+                          padFractionalZeros={false}
+                          thousandsSeparator={","}
+                          unmask={true}
+                          // inputRef={el => amountInput = el}
+                          value={amount}
+                          placeholder={"0.00"}/>
             </div>
           </div>
-          <div className={"balance"}>Balance: <strong>{fromCurrency.unit}{currentWallet.balance}</strong></div>
+          <div className={"balance"}>Balance: <strong>{fromCurrency.unit}{currencyFormatter(currentWallet.balance.toString())}</strong></div>
         </div>
         <div className={"switch noselect"} onClick={onSwitchClick}>&lt;&gt;</div>
 
@@ -293,11 +324,11 @@ function App() {
             <div className={"amount-box"}>
               <label>{toCurrency ? toCurrency.unit : ''}</label>
               <input className={"amount"} readOnly={true}
-                     value={toAmount}/>
+                     value={currencyFormatter(toAmount.toString())}/>
             </div>
           </div>
           <div className={`rate ${!toCurrency ? 'hide' : ''}`}>
-            Rate: 1 {fromCurrency.label} = <strong>{rate}</strong> {toCurrency ? toCurrency.label : ''}
+            1 {fromCurrency.label} = <strong>{rate}</strong> {toCurrency ? toCurrency.label : ''}
             {fromCurrencyVal !== toCurrencyVal ? <><br/>
               <span style={{color: "rgb(202, 120, 0)"}}>The rate might change anytime</span></> : null}</div>
         </div>
@@ -321,11 +352,11 @@ function App() {
       <Backdrop className={"exchange-notify"} open={isExchanging !== null} onClick={onExchangeNotifyClick}>
         {!isExchangeSuccess ? <div className={"exchange-progress"}><CircularProgress color="inherit"/></div> : null}
         {isExchangeSuccess ? <div className={"exchange-success-notify"}>
-          <CheckCircleTwoToneIcon className={"icon"} />
+          <CheckCircleTwoToneIcon className={"icon"}/>
           <div className={"message"}>Completed<br/></div>
           <div className={"balance"}>
             <strong>{toCurrency.label}</strong> balance:
-            <div className={'currency'}>{toCurrency.unit} { currentToWallet.balance}</div>
+            <div className={'currency'}>{toCurrency.unit} {currencyFormatter(currentToWallet.balance.toString())}</div>
           </div>
         </div> : null}
       </Backdrop>
