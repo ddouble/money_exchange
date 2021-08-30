@@ -170,6 +170,14 @@ option:disabled {
   visibility: hidden;
 }
 
+.to-currency .rate .tip {
+  color: rgb(202, 120, 0);
+}
+
+.to-currency .rate .tip.hide {
+  visibility: hidden;
+}
+
 .alert-message-box {
   margin-top: 20px;
   /*visibility: hidden;*/

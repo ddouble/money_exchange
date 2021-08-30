@@ -19,8 +19,8 @@ function isNumber(val) {
 
 const wallets = [
   {currency: 'usd', balance: 200},
-  {currency: 'gbp', balance: 380},
-  {currency: 'eur', balance: 5230}
+  {currency: 'gbp', balance: 150},
+  {currency: 'eur', balance: 10}
 ];
 
 const currencies = [
@@ -330,9 +330,8 @@ function App() {
             </div>
           </div>
           <div className={`rate ${!toCurrency ? 'hide' : ''}`}>
-            1 {fromCurrency.label} = <strong>{rate}</strong> {toCurrency ? toCurrency.label : ''}
-            {fromCurrencyVal !== toCurrencyVal ? <><br/>
-              <span style={{color: "rgb(202, 120, 0)"}}>The rate might change anytime</span></> : null}</div>
+            1 {fromCurrency.label} = <strong>{rate}</strong> {toCurrency ? toCurrency.label : ''}<br/>
+            <span className={`tip ${fromCurrencyVal === toCurrencyVal ? "hide" : ''}`}>The rate might change anytime</span></div>
         </div>
       </div>
 
