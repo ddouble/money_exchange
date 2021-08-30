@@ -343,7 +343,7 @@ function App() {
 
       <div>
         <Button
-          disabled={!isNumber(amount) || !amount || toCurrencyVal === fromCurrencyVal || !toCurrency || isExchanging !== null || hasBlockedError()}
+          disabled={!isNumber(amount) || !parseFloat(amount) || toCurrencyVal === fromCurrencyVal || !toCurrency || isExchanging !== null || hasBlockedError()}
           variant={"contained"}
           disableElevation
           color={"primary"} size={"large"}
