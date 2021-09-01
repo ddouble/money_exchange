@@ -180,7 +180,7 @@ function App() {
     if (isExchanging) {
       /**
        * simulate long-time server operation
-       * there are one sixth opportunities to simulate failed status
+       * there are one sixth opportunities to simulate failure status
        */
 
       const {rates, amount, toCurrencyVal, fromCurrencyVal} = isExchanging;
@@ -189,14 +189,22 @@ function App() {
       // console.log(amount, rate, toAmount);
 
       setTimeout(() => {
-        // simulate success/failed status
-        const success = getRandomInt(5);
+        // simulate success/failure status
+
+        let success = getRandomInt(5);
+        let errorMssage = 'Exchange failed';
+        if (currentWallet.balance < amount) {
+          success = false;
+          errorMssage = 'No sufficient balance.';
+        }
+
         if (success) {
           wallets.forEach((v, i) => {
             if (v.currency === fromCurrencyVal) v.balance = roundMoney(v.balance - amount);
             else if (v.currency === toCurrencyVal) v.balance = roundMoney(v.balance + toAmount);
           });
 
+          setAmount('');
           setIsExchangeSuccess(true);
 
           // setTimeout(() => {
@@ -205,7 +213,7 @@ function App() {
         } else {
           setErrors(errors => ({
             ...errors,
-            exchange: {message: 'Exchange failed.'}
+            exchange: {message: errorMssage}
           }));
 
           // clear exchange error notify after seconds
